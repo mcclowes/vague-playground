@@ -1,36 +1,36 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Download, Copy, Check, AlertCircle, Loader2 } from "lucide-react"
-import { useState } from "react"
+import { Button } from "@/components/ui/button";
+import { Download, Copy, Check, AlertCircle, Loader2 } from "lucide-react";
+import { useState } from "react";
 
 interface OutputPanelProps {
-  output: string
-  error: string | null
-  format: "json" | "csv"
-  isRunning: boolean
+  output: string;
+  error: string | null;
+  format: "json" | "csv";
+  isRunning: boolean;
 }
 
 export function OutputPanel({ output, error, format, isRunning }: OutputPanelProps) {
-  const [copied, setCopied] = useState(false)
+  const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(output)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
+    await navigator.clipboard.writeText(output);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const handleDownload = () => {
-    const blob = new Blob([output], { type: "text/plain" })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = `vague-output.${format}`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
-  }
+    const blob = new Blob([output], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `vague-output.${format}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="flex h-full flex-col bg-card">
@@ -87,16 +87,16 @@ export function OutputPanel({ output, error, format, isRunning }: OutputPanelPro
         )}
       </div>
     </div>
-  )
+  );
 }
 
 function formatOutput(output: string, format: "json" | "csv"): string {
   if (format === "json") {
     try {
-      return JSON.stringify(JSON.parse(output), null, 2)
+      return JSON.stringify(JSON.parse(output), null, 2);
     } catch {
-      return output
+      return output;
     }
   }
-  return output
+  return output;
 }

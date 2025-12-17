@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Upload } from "lucide-react"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Upload } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -12,24 +12,24 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 
 interface FileImportProps {
-  onImport: (code: string) => void
+  onImport: (code: string) => void;
 }
 
 export function FileImport({ onImport }: FileImportProps) {
-  const [open, setOpen] = useState(false)
-  const [isInferring, setIsInferring] = useState(false)
+  const [open, setOpen] = useState(false);
+  const [isInferring, setIsInferring] = useState(false);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file) return
+    const file = event.target.files?.[0];
+    if (!file) return;
 
-    setIsInferring(true)
+    setIsInferring(true);
 
     try {
-      const text = await file.text()
+      const text = await file.text();
 
       const response = await fetch("/api/infer", {
         method: "POST",
@@ -38,22 +38,22 @@ export function FileImport({ onImport }: FileImportProps) {
           data: text,
           format: file.name.endsWith(".csv") ? "csv" : "json",
         }),
-      })
+      });
 
-      const result = await response.json()
+      const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || "Inference failed")
+        throw new Error(result.error || "Inference failed");
       }
 
-      onImport(result.code)
-      setOpen(false)
+      onImport(result.code);
+      setOpen(false);
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Failed to infer schema from file")
+      alert(err instanceof Error ? err.message : "Failed to infer schema from file");
     } finally {
-      setIsInferring(false)
+      setIsInferring(false);
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -92,5 +92,5 @@ export function FileImport({ onImport }: FileImportProps) {
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

@@ -1,10 +1,12 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { CodeEditor } from "./code-editor"
-import { OutputPanel } from "./output-panel"
-import { Toolbar } from "./toolbar"
-import { FileImport } from "./file-import"
+import { useState, useEffect, useCallback } from "react";
+import { CodeEditor } from "./code-editor";
+import { OutputPanel } from "./output-panel";
+import { Toolbar } from "./toolbar";
+import { FileImport } from "./file-import";
+
+const STORAGE_KEY = "vague-playground-code";
 
 const DEFAULT_CODE = `schema Customer {
   name: string,
@@ -21,39 +23,69 @@ schema Invoice {
 dataset TestData {
   customers: 50 of Customer,
   invoices: 200 of Invoice
-}`
+}`;
+
+function getInitialCode(): string {
+  if (typeof window === "undefined") return DEFAULT_CODE;
+  return localStorage.getItem(STORAGE_KEY) || DEFAULT_CODE;
+}
 
 export function VaguePlayground() {
-  const [code, setCode] = useState(DEFAULT_CODE)
-  const [output, setOutput] = useState<string>("")
-  const [outputFormat, setOutputFormat] = useState<"json" | "csv">("json")
-  const [isRunning, setIsRunning] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [code, setCode] = useState(DEFAULT_CODE);
+  const [output, setOutput] = useState<string>("");
+  const [outputFormat, setOutputFormat] = useState<"json" | "csv">("json");
+  const [isRunning, setIsRunning] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleRun = async () => {
-    setIsRunning(true)
-    setError(null)
+  // Load from localStorage on mount
+  useEffect(() => {
+    setCode(getInitialCode());
+  }, []);
+
+  // Save to localStorage on change
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, code);
+  }, [code]);
+
+  const handleRun = useCallback(async () => {
+    setIsRunning(true);
+    setError(null);
 
     try {
       const response = await fetch("/api/execute", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code, format: outputFormat }),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Execution failed")
+        throw new Error(data.error || "Execution failed");
       }
 
-      setOutput(data.output)
+      setOutput(data.output);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error occurred")
+      setError(err instanceof Error ? err.message : "Unknown error occurred");
     } finally {
-      setIsRunning(false)
+      setIsRunning(false);
     }
-  }
+  }, [code, outputFormat]);
+
+  // Keyboard shortcut: Cmd/Ctrl+Enter to run
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+        e.preventDefault();
+        if (!isRunning) {
+          handleRun();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleRun, isRunning]);
 
   return (
     <div className="flex h-screen flex-col bg-background">
@@ -107,5 +139,5 @@ export function VaguePlayground() {
         </div>
       </div>
     </div>
-  )
+  );
 }

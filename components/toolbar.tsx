@@ -1,19 +1,23 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Play, FileJson, FileText } from "lucide-react"
+import { Button } from "@/components/ui/button";
+import { Play, FileJson, FileText } from "lucide-react";
 
 interface ToolbarProps {
-  onRun: () => void
-  isRunning: boolean
-  outputFormat: "json" | "csv"
-  onFormatChange: (format: "json" | "csv") => void
+  onRun: () => void;
+  isRunning: boolean;
+  outputFormat: "json" | "csv";
+  onFormatChange: (format: "json" | "csv") => void;
 }
 
 export function Toolbar({ onRun, isRunning, outputFormat, onFormatChange }: ToolbarProps) {
   return (
     <div className="flex items-center gap-3 border-b border-border bg-secondary px-6 py-3">
-      <Button onClick={onRun} disabled={isRunning} className="bg-primary text-primary-foreground hover:bg-primary/90">
+      <Button
+        onClick={onRun}
+        disabled={isRunning}
+        className="bg-primary text-primary-foreground hover:bg-primary/90"
+      >
         <Play className="mr-2 h-4 w-4" />
         {isRunning ? "Running..." : "Run Code"}
       </Button>
@@ -25,7 +29,9 @@ export function Toolbar({ onRun, isRunning, outputFormat, onFormatChange }: Tool
           size="sm"
           onClick={() => onFormatChange("json")}
           className={
-            outputFormat === "json" ? "bg-primary text-primary-foreground" : "border-border text-card-foreground"
+            outputFormat === "json"
+              ? "bg-primary text-primary-foreground"
+              : "border-border text-card-foreground"
           }
         >
           <FileJson className="mr-1 h-4 w-4" />
@@ -36,7 +42,9 @@ export function Toolbar({ onRun, isRunning, outputFormat, onFormatChange }: Tool
           size="sm"
           onClick={() => onFormatChange("csv")}
           className={
-            outputFormat === "csv" ? "bg-primary text-primary-foreground" : "border-border text-card-foreground"
+            outputFormat === "csv"
+              ? "bg-primary text-primary-foreground"
+              : "border-border text-card-foreground"
           }
         >
           <FileText className="mr-1 h-4 w-4" />
@@ -44,5 +52,5 @@ export function Toolbar({ onRun, isRunning, outputFormat, onFormatChange }: Tool
         </Button>
       </div>
     </div>
-  )
+  );
 }

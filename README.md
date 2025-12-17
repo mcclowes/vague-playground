@@ -1,30 +1,59 @@
-# Vague code playground
+# Vague Playground
 
-*Automatically synced with your [v0.app](https://v0.app) deployments*
+A web-based playground for testing and experimenting with [Vague](https://github.com/mcclowes/vague), a constraint-based data generation language.
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/mcclowes/v0-vague-code-playground)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.app-black?style=for-the-badge)](https://v0.app/chat/vHV2AkTffAe)
+## Features
 
-## Overview
+- Interactive code editor for Vague schemas
+- Real-time execution with JSON/CSV output
+- File import support
+- Dark/light theme
 
-This repository will stay in sync with your deployed chats on [v0.app](https://v0.app).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.app](https://v0.app).
+## Getting Started
+
+```bash
+npm install
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Scripts
+
+| Command          | Description               |
+| ---------------- | ------------------------- |
+| `npm run dev`    | Start development server  |
+| `npm run build`  | Create production build   |
+| `npm run start`  | Start production server   |
+| `npm run lint`   | Run ESLint                |
+| `npm run format` | Format code with Prettier |
+
+## Example Vague Code
+
+```vague
+schema Customer {
+  name: string,
+  status: 0.8: "active" | 0.2: "inactive"
+}
+
+schema Invoice {
+  customer: any of customers,
+  amount: decimal in 100..10000,
+  status: "draft" | "sent" | "paid",
+  assume amount > 0
+}
+
+dataset TestData {
+  customers: 50 of Customer,
+  invoices: 200 of Invoice
+}
+```
 
 ## Deployment
 
-Your project is live at:
+Deployed on Vercel: [vercel.com/mcclowes/v0-vague-code-playground](https://vercel.com/mcclowes/v0-vague-code-playground)
 
-**[https://vercel.com/mcclowes/v0-vague-code-playground](https://vercel.com/mcclowes/v0-vague-code-playground)**
+## Links
 
-## Build your app
-
-Continue building your app on:
-
-**[https://v0.app/chat/vHV2AkTffAe](https://v0.app/chat/vHV2AkTffAe)**
-
-## How It Works
-
-1. Create and modify your project using [v0.app](https://v0.app)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+- [Vague Language Repository](https://github.com/mcclowes/vague)
+- [v0 Chat](https://v0.app/chat/vHV2AkTffAe)
