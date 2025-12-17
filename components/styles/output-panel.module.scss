@@ -11,17 +11,29 @@
   padding: 0.75rem 1.5rem;
   border-bottom: 1px solid var(--border);
   background: var(--card);
+
+  @media (max-width: 640px) {
+    padding: 0.5rem 0.75rem;
+  }
 }
 
 .title {
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--muted-foreground);
+
+  @media (max-width: 640px) {
+    font-size: 0.75rem;
+  }
 }
 
 .actions {
   display: flex;
   gap: 0.5rem;
+
+  @media (max-width: 640px) {
+    gap: 0.25rem;
+  }
 }
 
 .content {
@@ -29,6 +41,10 @@
   overflow: auto;
   padding: 1.5rem;
   background: var(--card);
+
+  @media (max-width: 640px) {
+    padding: 0.75rem;
+  }
 }
 
 .output {
@@ -38,6 +54,11 @@
   white-space: pre-wrap;
   word-break: break-word;
   color: var(--card-foreground);
+
+  @media (max-width: 640px) {
+    font-size: 0.75rem;
+    line-height: 1.5;
+  }
 }
 
 .error {
@@ -51,6 +72,10 @@
   height: 100%;
   color: var(--muted-foreground);
   font-size: 0.875rem;
+
+  @media (max-width: 640px) {
+    font-size: 0.75rem;
+  }
 }
 
 .loading {
