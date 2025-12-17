@@ -4,10 +4,12 @@ A web-based playground for testing and experimenting with [Vague](https://github
 
 ## Features
 
-- Interactive code editor for Vague schemas
-- Real-time execution with JSON/CSV output
-- File import support
-- Dark/light theme
+- Interactive code editor with syntax highlighting
+- Real-time syntax validation with inline errors
+- JSON/CSV output formats
+- File import with automatic schema inference
+- Code persistence (localStorage)
+- Keyboard shortcuts (⌘/Ctrl+Enter to run)
 
 ## Getting Started
 
@@ -20,13 +22,15 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Scripts
 
-| Command          | Description               |
-| ---------------- | ------------------------- |
-| `npm run dev`    | Start development server  |
-| `npm run build`  | Create production build   |
-| `npm run start`  | Start production server   |
-| `npm run lint`   | Run ESLint                |
-| `npm run format` | Format code with Prettier |
+| Command            | Description               |
+| ------------------ | ------------------------- |
+| `npm run dev`      | Start development server  |
+| `npm run build`    | Create production build   |
+| `npm run start`    | Start production server   |
+| `npm run lint`     | Run ESLint                |
+| `npm run format`   | Format code with Prettier |
+| `npm run test`     | Run tests (watch mode)    |
+| `npm run test:run` | Run tests once            |
 
 ## Example Vague Code
 
@@ -56,4 +60,3 @@ Deployed on Vercel: [vercel.com/mcclowes/v0-vague-code-playground](https://verce
 ## Links
 
 - [Vague Language Repository](https://github.com/mcclowes/vague)
-- [v0 Chat](https://v0.app/chat/vHV2AkTffAe)
