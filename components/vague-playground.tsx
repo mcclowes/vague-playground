@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import { CodeEditor } from "./code-editor";
 import { OutputPanel } from "./output-panel";
 import { Toolbar } from "./toolbar";
@@ -94,14 +95,13 @@ export function VaguePlayground() {
     <div className={styles.container}>
       <header className={styles.header}>
         <div className={styles.logoSection}>
-          <div className={styles.logoIcon}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M4 7h16M4 12h16M4 17h16" />
-              <circle cx="7" cy="7" r="1" fill="currentColor" />
-              <circle cx="7" cy="12" r="1" fill="currentColor" />
-              <circle cx="7" cy="17" r="1" fill="currentColor" />
-            </svg>
-          </div>
+          <Image
+            src="/logo.png"
+            alt="Vague Playground"
+            width={40}
+            height={40}
+            className={styles.logoImage}
+          />
           <div>
             <h1 className={styles.title}>Vague Playground</h1>
             <p className={styles.subtitle}>Constraint-based data generation</p>
