@@ -5,7 +5,7 @@ import { EditorState } from "@codemirror/state";
 import { EditorView, keymap, lineNumbers, highlightActiveLine } from "@codemirror/view";
 import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
 import { syntaxHighlighting, HighlightStyle } from "@codemirror/language";
-import { linter, type Diagnostic } from "@codemirror/lint";
+import { linter, lintGutter, type Diagnostic } from "@codemirror/lint";
 import { tags } from "@lezer/highlight";
 import { StreamLanguage } from "@codemirror/language";
 import styles from "./styles/code-editor.module.scss";
@@ -113,17 +113,25 @@ const editorTheme = EditorView.theme({
     overflow: "auto",
   },
   ".cm-diagnostic-error": {
-    borderLeft: "3px solid oklch(0.6 0.25 25)",
+    borderLeft: "3px solid var(--destructive)",
     paddingLeft: "8px",
-    backgroundColor: "oklch(0.6 0.15 25 / 0.1)",
+    backgroundColor: "oklch(from var(--destructive) l c h / 0.1)",
   },
   ".cm-lintRange-error": {
     backgroundImage: "none",
-    textDecoration: "wavy underline oklch(0.6 0.25 25)",
+    textDecoration: "wavy underline var(--destructive)",
     textUnderlineOffset: "3px",
   },
+  ".cm-gutter-lint": {
+    width: "16px",
+  },
+  ".cm-lint-marker": {
+    width: "6px",
+    height: "6px",
+    borderRadius: "50%",
+  },
   ".cm-lint-marker-error": {
-    content: '""',
+    backgroundColor: "var(--destructive)",
   },
 });
 
@@ -201,6 +209,7 @@ export function CodeEditor({ code, onChange }: CodeEditorProps) {
       doc: code,
       extensions: [
         lineNumbers(),
+        lintGutter(),
         highlightActiveLine(),
         history(),
         keymap.of([...defaultKeymap, ...historyKeymap]),

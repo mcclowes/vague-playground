@@ -1,5 +1,19 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { compile, datasetToSingleCSV } from "vague-lang";
+import {
+  compile,
+  datasetToSingleCSV,
+  registerPlugin,
+  fakerPlugin,
+  fakerShorthandPlugin,
+  issuerPlugin,
+  datePlugin,
+} from "vague-lang";
+
+// Register plugins once on module load
+registerPlugin(fakerPlugin);
+registerPlugin(fakerShorthandPlugin);
+registerPlugin(issuerPlugin);
+registerPlugin(datePlugin);
 
 export async function POST(request: NextRequest) {
   try {
