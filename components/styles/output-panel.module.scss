@@ -48,16 +48,16 @@
 }
 
 .output {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.875rem;
-  line-height: 1.6;
-  white-space: pre-wrap;
-  word-break: break-word;
-  color: var(--card-foreground);
+  height: 100%;
+
+  :global(.cm-editor) {
+    height: 100%;
+  }
 
   @media (max-width: 640px) {
-    font-size: 0.75rem;
-    line-height: 1.5;
+    :global(.cm-content) {
+      font-size: 0.75rem;
+    }
   }
 }
 

@@ -2,7 +2,12 @@
 
 import { Button } from "@/components/ui/button";
 import { Download, Copy, Check, AlertCircle } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { EditorState } from "@codemirror/state";
+import { EditorView } from "@codemirror/view";
+import { syntaxHighlighting, HighlightStyle, StreamLanguage } from "@codemirror/language";
+import { json } from "@codemirror/lang-json";
+import { tags } from "@lezer/highlight";
 import styles from "./styles/output-panel.module.scss";
 
 interface OutputPanelProps {
@@ -12,8 +17,82 @@ interface OutputPanelProps {
   isRunning: boolean;
 }
 
+const csvLanguage = StreamLanguage.define({
+  token(stream) {
+    if (stream.sol()) {
+      stream.eatWhile(/[^,\n]/);
+      return "variableName";
+    }
+
+    if (stream.eat(",")) {
+      return "punctuation";
+    }
+
+    if (stream.match(/"[^"]*"/)) {
+      return "string";
+    }
+
+    if (stream.match(/-?\d+\.?\d*/)) {
+      return "number";
+    }
+
+    if (stream.match(/\b(true|false)\b/i)) {
+      return "bool";
+    }
+
+    stream.eatWhile(/[^,\n]/);
+    return "string";
+  },
+});
+
+const outputHighlightStyle = HighlightStyle.define([
+  { tag: tags.propertyName, color: "oklch(0.7 0.15 270)" },
+  { tag: tags.string, color: "oklch(0.7 0.18 140)" },
+  { tag: tags.number, color: "oklch(0.75 0.15 60)" },
+  { tag: tags.bool, color: "oklch(0.65 0.15 340)" },
+  { tag: tags.null, color: "oklch(0.5 0 0)" },
+  { tag: tags.punctuation, color: "oklch(0.6 0 0)" },
+  { tag: tags.variableName, color: "oklch(0.8 0.05 250)" },
+]);
+
+const outputTheme = EditorView.theme({
+  "&": {
+    height: "100%",
+    fontSize: "14px",
+    backgroundColor: "transparent",
+  },
+  ".cm-content": {
+    fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+    padding: "0",
+    caretColor: "transparent",
+  },
+  ".cm-line": {
+    lineHeight: "1.6",
+  },
+  ".cm-scroller": {
+    overflow: "auto",
+  },
+  ".cm-cursor": {
+    display: "none",
+  },
+  "&.cm-focused .cm-cursor": {
+    display: "none",
+  },
+  "&.cm-focused": {
+    outline: "none",
+  },
+  ".cm-selectionBackground": {
+    backgroundColor: "oklch(0.7 0.1 250 / 0.3)",
+  },
+  "&.cm-focused .cm-selectionBackground": {
+    backgroundColor: "oklch(0.7 0.1 250 / 0.3)",
+  },
+});
+
 export function OutputPanel({ output, error, format, isRunning }: OutputPanelProps) {
   const [copied, setCopied] = useState(false);
+  const editorRef = useRef<HTMLDivElement>(null);
+  const viewRef = useRef<EditorView | null>(null);
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(output);
@@ -32,6 +111,47 @@ export function OutputPanel({ output, error, format, isRunning }: OutputPanelPro
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
+
+  const formattedOutput = formatOutput(output, format);
+
+  useEffect(() => {
+    if (!editorRef.current || !output || error) {
+      if (viewRef.current) {
+        viewRef.current.destroy();
+        viewRef.current = null;
+      }
+      return;
+    }
+
+    const languageExtension = format === "json" ? json() : csvLanguage;
+
+    const state = EditorState.create({
+      doc: formattedOutput,
+      extensions: [
+        EditorView.editable.of(false),
+        languageExtension,
+        syntaxHighlighting(outputHighlightStyle),
+        outputTheme,
+        EditorView.lineWrapping,
+      ],
+    });
+
+    if (viewRef.current) {
+      viewRef.current.destroy();
+    }
+
+    viewRef.current = new EditorView({
+      state,
+      parent: editorRef.current,
+    });
+
+    return () => {
+      if (viewRef.current) {
+        viewRef.current.destroy();
+        viewRef.current = null;
+      }
+    };
+  }, [formattedOutput, format, output, error]);
 
   return (
     <div className={styles.container}>
@@ -75,9 +195,7 @@ export function OutputPanel({ output, error, format, isRunning }: OutputPanelPro
             </div>
           </div>
         ) : output ? (
-          <pre className={styles.output}>
-            <code>{formatOutput(output, format)}</code>
-          </pre>
+          <div ref={editorRef} className={styles.output} />
         ) : (
           <div className={styles.placeholder}>Run your Vague code to see output here</div>
         )}
