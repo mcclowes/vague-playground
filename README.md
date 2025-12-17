@@ -60,3 +60,4 @@ Deployed on Vercel: [vercel.com/mcclowes/v0-vague-code-playground](https://verce
 ## Links
 
 - [Vague Language Repository](https://github.com/mcclowes/vague)
+- [vague-lang on npm](https://www.npmjs.com/package/vague-lang)
