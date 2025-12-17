@@ -5,6 +5,8 @@ import { CodeEditor } from "./code-editor";
 import { OutputPanel } from "./output-panel";
 import { Toolbar } from "./toolbar";
 import { FileImport } from "./file-import";
+import { ExampleSelector } from "./example-selector";
+import { ThemeToggle } from "./theme-toggle";
 import styles from "./styles/vague-playground.module.scss";
 
 const STORAGE_KEY = "vague-playground-code";
@@ -106,6 +108,7 @@ export function VaguePlayground() {
           </div>
         </div>
         <div className={styles.headerActions}>
+          <ExampleSelector onSelect={setCode} />
           <a
             href="https://github.com/mcclowes/vague"
             target="_blank"
@@ -115,6 +118,7 @@ export function VaguePlayground() {
             Documentation
           </a>
           <FileImport onImport={setCode} />
+          <ThemeToggle />
         </div>
       </header>
 

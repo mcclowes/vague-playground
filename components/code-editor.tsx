@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import { EditorState } from "@codemirror/state";
 import { EditorView, keymap, lineNumbers, highlightActiveLine } from "@codemirror/view";
 import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
@@ -166,9 +166,15 @@ const vagueLinter = linter(
   { delay: 500 }
 );
 
+interface CursorPosition {
+  line: number;
+  column: number;
+}
+
 export function CodeEditor({ code, onChange }: CodeEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
+  const [cursorPos, setCursorPos] = useState<CursorPosition>({ line: 1, column: 1 });
 
   const handleChange = useCallback(
     (update: { state: EditorState; docChanged: boolean }) => {
@@ -178,6 +184,15 @@ export function CodeEditor({ code, onChange }: CodeEditorProps) {
     },
     [onChange]
   );
+
+  const handleSelectionChange = useCallback((view: EditorView) => {
+    const pos = view.state.selection.main.head;
+    const line = view.state.doc.lineAt(pos);
+    setCursorPos({
+      line: line.number,
+      column: pos - line.from + 1,
+    });
+  }, []);
 
   useEffect(() => {
     if (!editorRef.current) return;
@@ -194,6 +209,11 @@ export function CodeEditor({ code, onChange }: CodeEditorProps) {
         editorTheme,
         vagueLinter,
         EditorView.updateListener.of(handleChange),
+        EditorView.updateListener.of((update) => {
+          if (update.selectionSet || update.docChanged) {
+            handleSelectionChange(update.view);
+          }
+        }),
         EditorView.lineWrapping,
       ],
     });
@@ -209,7 +229,7 @@ export function CodeEditor({ code, onChange }: CodeEditorProps) {
       view.destroy();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [handleSelectionChange]);
 
   useEffect(() => {
     const view = viewRef.current;
@@ -227,6 +247,11 @@ export function CodeEditor({ code, onChange }: CodeEditorProps) {
   return (
     <div className={styles.container}>
       <div ref={editorRef} className={styles.editor} />
+      <div className={styles.statusBar}>
+        <span className={styles.cursorPosition}>
+          Ln {cursorPos.line}, Col {cursorPos.column}
+        </span>
+      </div>
     </div>
   );
 }

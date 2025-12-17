@@ -3,10 +3,13 @@
   flex: 1;
   overflow: hidden;
   background: var(--card);
+  display: flex;
+  flex-direction: column;
 }
 
 .editor {
-  height: 100%;
+  flex: 1;
+  overflow: hidden;
 
   // Mobile optimizations for CodeMirror
   @media (max-width: 640px) {
@@ -27,4 +30,19 @@
       min-width: 2rem;
     }
   }
+}
+
+.statusBar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  background: var(--muted);
+  border-top: 1px solid var(--border);
+}
+
+.cursorPosition {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
