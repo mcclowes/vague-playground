@@ -5,6 +5,7 @@ import { CodeEditor } from "./code-editor";
 import { OutputPanel } from "./output-panel";
 import { Toolbar } from "./toolbar";
 import { FileImport } from "./file-import";
+import styles from "./styles/vague-playground.module.scss";
 
 const STORAGE_KEY = "vague-playground-code";
 
@@ -88,17 +89,11 @@ export function VaguePlayground() {
   }, [handleRun, isRunning]);
 
   return (
-    <div className="flex h-screen flex-col bg-background">
-      <header className="flex items-center justify-between border-b border-border bg-card px-6 py-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-            <svg
-              className="h-6 w-6 text-primary-foreground"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
+    <div className={styles.container}>
+      <header className={styles.header}>
+        <div className={styles.logoSection}>
+          <div className={styles.logoIcon}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M4 7h16M4 12h16M4 17h16" />
               <circle cx="7" cy="7" r="1" fill="currentColor" />
               <circle cx="7" cy="12" r="1" fill="currentColor" />
@@ -106,16 +101,16 @@ export function VaguePlayground() {
             </svg>
           </div>
           <div>
-            <h1 className="text-xl font-semibold text-card-foreground">Vague Playground</h1>
-            <p className="text-sm text-muted-foreground">Constraint-based data generation</p>
+            <h1 className={styles.title}>Vague Playground</h1>
+            <p className={styles.subtitle}>Constraint-based data generation</p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className={styles.headerActions}>
           <a
             href="https://github.com/mcclowes/vague"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-sm text-muted-foreground hover:text-card-foreground"
+            className={styles.docsLink}
           >
             Documentation
           </a>
@@ -123,8 +118,8 @@ export function VaguePlayground() {
         </div>
       </header>
 
-      <div className="flex flex-1 overflow-hidden">
-        <div className="flex w-1/2 flex-col border-r border-border">
+      <div className={styles.main}>
+        <div className={styles.editorPanel}>
           <Toolbar
             onRun={handleRun}
             isRunning={isRunning}
@@ -134,7 +129,7 @@ export function VaguePlayground() {
           <CodeEditor code={code} onChange={setCode} />
         </div>
 
-        <div className="flex w-1/2 flex-col">
+        <div className={styles.outputPanel}>
           <OutputPanel output={output} error={error} format={outputFormat} isRunning={isRunning} />
         </div>
       </div>

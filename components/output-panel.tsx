@@ -1,8 +1,9 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Download, Copy, Check, AlertCircle, Loader2 } from "lucide-react";
+import { Download, Copy, Check, AlertCircle } from "lucide-react";
 import { useState } from "react";
+import styles from "./styles/output-panel.module.scss";
 
 interface OutputPanelProps {
   output: string;
@@ -33,11 +34,11 @@ export function OutputPanel({ output, error, format, isRunning }: OutputPanelPro
   };
 
   return (
-    <div className="flex h-full flex-col bg-card">
-      <div className="flex items-center justify-between border-b border-border bg-secondary px-6 py-3">
-        <h2 className="text-sm font-semibold text-card-foreground">Output</h2>
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <h2 className={styles.title}>Output</h2>
         {output && !error && (
-          <div className="flex items-center gap-2">
+          <div className={styles.actions}>
             <Button
               variant="outline"
               size="sm"
@@ -60,30 +61,25 @@ export function OutputPanel({ output, error, format, isRunning }: OutputPanelPro
         )}
       </div>
 
-      <div className="flex-1 overflow-auto p-6">
+      <div className={styles.content}>
         {isRunning ? (
-          <div className="flex h-full items-center justify-center">
-            <div className="text-center">
-              <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" />
-              <p className="mt-4 text-sm text-muted-foreground">Generating data...</p>
-            </div>
+          <div className={styles.loading}>
+            <div className={styles.spinner} />
           </div>
         ) : error ? (
-          <div className="flex h-full items-center justify-center">
+          <div className={styles.placeholder}>
             <div className="text-center">
               <AlertCircle className="mx-auto h-8 w-8 text-destructive" />
-              <p className="mt-4 text-sm font-semibold text-destructive">Error</p>
-              <p className="mt-2 text-sm text-muted-foreground">{error}</p>
+              <p className={`mt-4 text-sm font-semibold ${styles.error}`}>Error</p>
+              <p className="mt-2 text-sm">{error}</p>
             </div>
           </div>
         ) : output ? (
-          <pre className="font-mono text-sm leading-relaxed text-card-foreground">
+          <pre className={styles.output}>
             <code>{formatOutput(output, format)}</code>
           </pre>
         ) : (
-          <div className="flex h-full items-center justify-center">
-            <p className="text-sm text-muted-foreground">Run your Vague code to see output here</p>
-          </div>
+          <div className={styles.placeholder}>Run your Vague code to see output here</div>
         )}
       </div>
     </div>

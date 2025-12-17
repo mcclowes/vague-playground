@@ -5,36 +5,39 @@ import { EditorState } from "@codemirror/state";
 import { EditorView, keymap, lineNumbers, highlightActiveLine } from "@codemirror/view";
 import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
 import { syntaxHighlighting, HighlightStyle } from "@codemirror/language";
+import { linter, type Diagnostic } from "@codemirror/lint";
 import { tags } from "@lezer/highlight";
 import { StreamLanguage } from "@codemirror/language";
+import styles from "./styles/code-editor.module.scss";
 
 interface CodeEditorProps {
   code: string;
   onChange: (code: string) => void;
 }
 
+interface ValidationError {
+  line: number;
+  column: number;
+  message: string;
+}
+
 const vagueLanguage = StreamLanguage.define({
   token(stream) {
-    // Skip whitespace
     if (stream.eatSpace()) return null;
 
-    // Comments
     if (stream.match("//")) {
       stream.skipToEnd();
       return "comment";
     }
 
-    // Strings
     if (stream.match(/"[^"]*"/)) {
       return "string";
     }
 
-    // Numbers (including ranges like 0.8: and 100..10000)
     if (stream.match(/\d+\.?\d*/)) {
       return "number";
     }
 
-    // Keywords
     if (
       stream.match(
         /\b(schema|dataset|assume|then|when|if|any|of|where|violating|unique|private|extends|faker|issuer|using|compute)\b/
@@ -43,27 +46,22 @@ const vagueLanguage = StreamLanguage.define({
       return "keyword";
     }
 
-    // Types
     if (stream.match(/\b(string|int|decimal|date|datetime|boolean)\b/)) {
       return "typeName";
     }
 
-    // Operators
     if (stream.match(/\b(in|and|or|not|sum|count|min|max|avg)\b/)) {
       return "operator";
     }
 
-    // Identifiers
     if (stream.match(/[a-zA-Z_][a-zA-Z0-9_]*/)) {
       return "variableName";
     }
 
-    // Punctuation
     if (stream.match(/[{}(),:|.]/)) {
       return "punctuation";
     }
 
-    // Skip unknown characters
     stream.next();
     return null;
   },
@@ -114,7 +112,59 @@ const editorTheme = EditorView.theme({
   ".cm-scroller": {
     overflow: "auto",
   },
+  ".cm-diagnostic-error": {
+    borderLeft: "3px solid oklch(0.6 0.25 25)",
+    paddingLeft: "8px",
+    backgroundColor: "oklch(0.6 0.15 25 / 0.1)",
+  },
+  ".cm-lintRange-error": {
+    backgroundImage: "none",
+    textDecoration: "wavy underline oklch(0.6 0.25 25)",
+    textUnderlineOffset: "3px",
+  },
+  ".cm-lint-marker-error": {
+    content: '""',
+  },
 });
+
+const vagueLinter = linter(
+  async (view) => {
+    const code = view.state.doc.toString();
+    if (!code.trim()) return [];
+
+    try {
+      const response = await fetch("/api/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code }),
+      });
+
+      const data = await response.json();
+
+      if (data.valid || !data.errors?.length) {
+        return [];
+      }
+
+      const diagnostics: Diagnostic[] = data.errors.map((error: ValidationError) => {
+        const line = view.state.doc.line(Math.min(error.line, view.state.doc.lines));
+        const from = line.from + Math.min(error.column - 1, line.length);
+        const to = Math.min(from + 10, line.to);
+
+        return {
+          from,
+          to,
+          severity: "error" as const,
+          message: error.message,
+        };
+      });
+
+      return diagnostics;
+    } catch {
+      return [];
+    }
+  },
+  { delay: 500 }
+);
 
 export function CodeEditor({ code, onChange }: CodeEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null);
@@ -142,6 +192,7 @@ export function CodeEditor({ code, onChange }: CodeEditorProps) {
         vagueLanguage,
         syntaxHighlighting(vagueHighlightStyle),
         editorTheme,
+        vagueLinter,
         EditorView.updateListener.of(handleChange),
         EditorView.lineWrapping,
       ],
@@ -157,11 +208,9 @@ export function CodeEditor({ code, onChange }: CodeEditorProps) {
     return () => {
       view.destroy();
     };
-    // Only initialize once
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Update editor content when code prop changes externally
   useEffect(() => {
     const view = viewRef.current;
     if (view && view.state.doc.toString() !== code) {
@@ -176,8 +225,8 @@ export function CodeEditor({ code, onChange }: CodeEditorProps) {
   }, [code]);
 
   return (
-    <div className="relative flex-1 overflow-hidden bg-card">
-      <div ref={editorRef} className="h-full" />
+    <div className={styles.container}>
+      <div ref={editorRef} className={styles.editor} />
     </div>
   );
 }
