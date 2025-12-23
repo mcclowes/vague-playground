@@ -7,6 +7,9 @@ import {
   fakerShorthandPlugin,
   issuerPlugin,
   datePlugin,
+  datesPlugin,
+  regexPlugin,
+  warningCollector,
 } from "vague-lang";
 
 // Register plugins once on module load
@@ -14,6 +17,8 @@ registerPlugin(fakerPlugin);
 registerPlugin(fakerShorthandPlugin);
 registerPlugin(issuerPlugin);
 registerPlugin(datePlugin);
+registerPlugin(datesPlugin);
+registerPlugin(regexPlugin);
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,7 +28,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No code provided" }, { status: 400 });
     }
 
+    // Clear any previous warnings
+    warningCollector.clear();
+
     const result = await compile(code);
+
+    // Collect any warnings from generation
+    const warnings = warningCollector.getWarnings();
 
     let output: string;
     if (format === "csv") {
@@ -32,7 +43,7 @@ export async function POST(request: NextRequest) {
       output = JSON.stringify(result, null, 2);
     }
 
-    return NextResponse.json({ output });
+    return NextResponse.json({ output, warnings });
   } catch (error) {
     console.error("Execute error:", error);
     const message = error instanceof Error ? error.message : "Failed to execute Vague code";

@@ -1,4 +1,4 @@
-# Vague Playground
+# Vague playground
 
 A web-based playground for testing and experimenting with [Vague](https://github.com/mcclowes/vague), a constraint-based data generation language.
 
@@ -10,6 +10,8 @@ A web-based playground for testing and experimenting with [Vague](https://github
 - File import with automatic schema inference
 - Code persistence (localStorage)
 - Keyboard shortcuts (⌘/Ctrl+Enter to run)
+- Preloaded example schemas
+- Dark/light mode with system preference support
 
 ## Getting Started
 
@@ -52,10 +54,6 @@ dataset TestData {
   invoices: 200 of Invoice
 }
 ```
-
-## Deployment
-
-Deployed on Vercel: [vercel.com/mcclowes/v0-vague-code-playground](https://vercel.com/mcclowes/v0-vague-code-playground)
 
 ## Links
 

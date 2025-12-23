@@ -29,15 +29,20 @@ components/
 │   ├── vague-playground.module.scss
 │   ├── code-editor.module.scss
 │   ├── output-panel.module.scss
-│   └── toolbar.module.scss
+│   ├── toolbar.module.scss
+│   ├── example-selector.module.scss
+│   └── theme-toggle.module.scss
 ├── vague-playground.tsx  # Main container (state, localStorage, shortcuts)
 ├── code-editor.tsx       # CodeMirror editor with Vague language mode + linting
 ├── output-panel.tsx      # Results display with copy/download
 ├── toolbar.tsx           # Run button, format selector, shortcut hint
 ├── file-import.tsx       # File upload dialog
+├── example-selector.tsx  # Dropdown to load example Vague schemas
+├── theme-toggle.tsx      # Light/dark mode toggle
 └── theme-provider.tsx    # next-themes wrapper
 lib/
-└── utils.ts              # cn() helper for classnames
+├── utils.ts              # cn() helper for classnames
+└── examples.ts           # Example Vague schemas for the selector
 __tests__/
 ├── utils.test.ts         # Unit tests for utilities
 └── vague-integration.test.ts  # Integration tests for vague-lang
@@ -64,6 +69,18 @@ npm run test:run     # Run tests once (CI)
 - **localStorage persistence** - Code persists across page refreshes
 - **Keyboard shortcuts** - Cmd/Ctrl+Enter to run code
 - **Syntax highlighting** - Custom CodeMirror language mode for Vague
+- **Example schemas** - Preloaded examples to demonstrate Vague syntax
+- **Dark/light mode** - Theme toggle with system preference support
+- **Generation warnings** - Displays non-fatal warnings (constraint retries, unique value exhaustion)
+
+## Registered Plugins
+
+The execute API registers these vague-lang plugins:
+
+- `fakerPlugin` / `fakerShorthandPlugin` - Realistic fake data (names, emails, addresses)
+- `issuerPlugin` - Sequential ID generation
+- `datePlugin` / `datesPlugin` - Date/time generation and manipulation
+- `regexPlugin` - Regex pattern matching
 
 ## Code Style
 

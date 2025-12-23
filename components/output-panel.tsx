@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Download, Copy, Check, AlertCircle } from "lucide-react";
+import { Download, Copy, Check, AlertCircle, AlertTriangle } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { EditorState } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
@@ -10,11 +10,19 @@ import { json } from "@codemirror/lang-json";
 import { tags } from "@lezer/highlight";
 import styles from "./styles/output-panel.module.scss";
 
+interface VagueWarning {
+  type: string;
+  message: string;
+  field?: string;
+  schema?: string;
+}
+
 interface OutputPanelProps {
   output: string;
   error: string | null;
   format: "json" | "csv";
   isRunning: boolean;
+  warnings?: VagueWarning[];
 }
 
 const csvLanguage = StreamLanguage.define({
@@ -89,7 +97,7 @@ const outputTheme = EditorView.theme({
   },
 });
 
-export function OutputPanel({ output, error, format, isRunning }: OutputPanelProps) {
+export function OutputPanel({ output, error, format, isRunning, warnings = [] }: OutputPanelProps) {
   const [copied, setCopied] = useState(false);
   const editorRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
@@ -195,7 +203,19 @@ export function OutputPanel({ output, error, format, isRunning }: OutputPanelPro
             </div>
           </div>
         ) : output ? (
-          <div ref={editorRef} className={styles.output} />
+          <>
+            {warnings.length > 0 && (
+              <div className={styles.warnings}>
+                {warnings.map((warning, i) => (
+                  <div key={i} className={styles.warning}>
+                    <AlertTriangle className="h-4 w-4 shrink-0" />
+                    <span>{warning.message}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div ref={editorRef} className={styles.output} />
+          </>
         ) : (
           <div className={styles.placeholder}>Run your Vague code to see output here</div>
         )}

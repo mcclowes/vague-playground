@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Play, FileJson, FileText } from "lucide-react";
+import { Play, FileJson, FileText, Save } from "lucide-react";
 import styles from "./styles/toolbar.module.scss";
 
 interface ToolbarProps {
@@ -9,9 +9,22 @@ interface ToolbarProps {
   isRunning: boolean;
   outputFormat: "json" | "csv";
   onFormatChange: (format: "json" | "csv") => void;
+  code: string;
 }
 
-export function Toolbar({ onRun, isRunning, outputFormat, onFormatChange }: ToolbarProps) {
+export function Toolbar({ onRun, isRunning, outputFormat, onFormatChange, code }: ToolbarProps) {
+  const handleSaveSchema = () => {
+    const blob = new Blob([code], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "schema.vague";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.leftSection}>
@@ -22,6 +35,15 @@ export function Toolbar({ onRun, isRunning, outputFormat, onFormatChange }: Tool
         >
           <Play className="mr-2 h-4 w-4" />
           {isRunning ? "Running..." : "Run Code"}
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleSaveSchema}
+          className="border-border text-card-foreground bg-transparent"
+        >
+          <Save className="mr-1 h-4 w-4" />
+          Save
         </Button>
         <span className={styles.shortcutHint}>
           <kbd className={styles.kbd}>⌘</kbd>

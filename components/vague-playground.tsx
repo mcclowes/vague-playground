@@ -34,12 +34,20 @@ function getInitialCode(): string {
   return localStorage.getItem(STORAGE_KEY) || DEFAULT_CODE;
 }
 
+interface VagueWarning {
+  type: string;
+  message: string;
+  field?: string;
+  schema?: string;
+}
+
 export function VaguePlayground() {
   const [code, setCode] = useState(DEFAULT_CODE);
   const [output, setOutput] = useState<string>("");
   const [outputFormat, setOutputFormat] = useState<"json" | "csv">("json");
   const [isRunning, setIsRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [warnings, setWarnings] = useState<VagueWarning[]>([]);
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -54,6 +62,7 @@ export function VaguePlayground() {
   const handleRun = useCallback(async () => {
     setIsRunning(true);
     setError(null);
+    setWarnings([]);
 
     try {
       const response = await fetch("/api/execute", {
@@ -69,6 +78,7 @@ export function VaguePlayground() {
       }
 
       setOutput(data.output);
+      setWarnings(data.warnings || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error occurred");
     } finally {
@@ -129,12 +139,19 @@ export function VaguePlayground() {
             isRunning={isRunning}
             outputFormat={outputFormat}
             onFormatChange={setOutputFormat}
+            code={code}
           />
           <CodeEditor code={code} onChange={setCode} />
         </div>
 
         <div className={styles.outputPanel}>
-          <OutputPanel output={output} error={error} format={outputFormat} isRunning={isRunning} />
+          <OutputPanel
+            output={output}
+            error={error}
+            format={outputFormat}
+            isRunning={isRunning}
+            warnings={warnings}
+          />
         </div>
       </div>
     </div>
